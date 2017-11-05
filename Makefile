@@ -13,6 +13,13 @@ lib/libmalloc-ff.so:     src/malloc.c
 
 # TODO: rules for remaining libraries
 
+lib/libmalloc-nf.so:     src/malloc.c
+	$(CC) -shared -fPIC $(CFLAGS) -DFIT=1 -o $@ $< $(LDFLAGS)
+lib/libmalloc-bf.so:     src/malloc.c
+	$(CC) -shared -fPIC $(CFLAGS) -DFIT=2 -o $@ $< $(LDFLAGS)
+lib/libmalloc-wf.so:     src/malloc.c
+	$(CC) -shared -fPIC $(CFLAGS) -DFIT=3 -o $@ $< $(LDFLAGS)
+
 clean:
 	rm -f $(LIBRARIES)
 
