@@ -46,6 +46,7 @@ size_t max_heap_size = 0;
 void print_counters(void){
     char buffer[BUFSIZ];
     int n;
+    /*
     n = sprintf(buffer, "mallocs:   %zu\n", num_mallocs);
     write(STDOUT_FILENO, buffer, n);  
     n = sprintf(buffer, "frees:     %zu\n", num_frees);
@@ -64,7 +65,7 @@ void print_counters(void){
     write(STDOUT_FILENO, buffer, n);
     n = sprintf(buffer, "max heap:  %zu\n", max_heap_size);
     write(STDOUT_FILENO, buffer, n);
-     
+    */ 
 }
 
 /* Find free block -----------------------------------------------------------*/
@@ -181,7 +182,7 @@ void *malloc(size_t size) {
         num_reuses++;
     }
 
-    /* TODO: Split free block? */
+    /* Split free block? */
     if ( next && (next->size > (size + sizeof(struct block) + 4)) ) {
     
 
@@ -223,7 +224,7 @@ void *malloc(size_t size) {
         
         
     }   
-
+    
 
     /* Could not find free block, so grow heap */
     if (next == NULL) {
@@ -248,6 +249,12 @@ void *malloc(size_t size) {
     num_mallocs++;
 
     /* Return data address associated with block */
+
+    char buffer[BUFSIZ];
+    int n;
+    n = sprintf(buffer, "allocate: %p\n", next);
+    write(STDOUT_FILENO, buffer, n);  
+    
     return BLOCK_DATA(next);
 }
 
@@ -260,14 +267,23 @@ void free(void *ptr) {
     if (ptr == NULL) {
         return;
     }
+    char buffer[BUFSIZ];
+    int n;
+    n = sprintf(buffer, "try to free: %p\n", ptr);
+    write(STDOUT_FILENO, buffer, n);  
+
+
 
     /* Make block as free */
     struct block *curr = BLOCK_HEADER(ptr); 
    
+    n = sprintf(buffer, "curr: %p\n", curr);
+    write(STDOUT_FILENO, buffer, n);  
+    
     assert(curr->free == 0);
     curr->free = true;
 
-    /* TODO: Coalesce free blocks? */
+    /* Coalesce free blocks? */
     struct block *free_pointer = FreeList;
     while (free_pointer){
         while (coalesce_check(free_pointer)) {
