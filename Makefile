@@ -26,6 +26,6 @@ bin/test1:		src/test1.c
 	$(CC) $(CFLAGS) -o $@ $< 
 
 clean:
-	rm -f $(LIBRARIES)
+	rm -f $(LIBRARIES) $(TEST_EXECUTABLES)
 
 .PHONY: all clean
