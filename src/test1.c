@@ -1,19 +1,18 @@
 #include <stdlib.h>
+#include <unistd.h>
+#include <stdio.h>
 
+#define NUM_ALLOCS 1000
 
 int main(int argc, char* argv[]){
 
-    int *var_one = malloc(1000*sizeof(int));
-    int *var_two = malloc(2*sizeof(int));
-    int *var_three = malloc(4*sizeof(int));
+    char buffer[BUFSIZ];
+    int  n;
 
-    free(var_one); 
-    free(var_two);
-    free(var_three);
-
-    
-    for (int i = 29; i > 0; i--){
-        int *var_four = malloc(i*sizeof(int));
+    for (int i = NUM_ALLOCS; i > 0; i--){
+        int *var_four = malloc(1*sizeof(int));
+        n = sprintf(buffer, "Pointer[%d] in Main: %p\n", i, var_four);
+        write(STDOUT_FILENO, buffer, n);
         free(var_four);
     }
 
