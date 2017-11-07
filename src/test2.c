@@ -11,15 +11,15 @@ int main(int argc, char* argv[]){
 
     for (int i = NUM_ALLOCS; i > 0; i--){
 
-        int *var_four = malloc(i*sizeof(int));
+        int *var_four = malloc(sizeof(int));
         n = sprintf(buffer, "var_four[%d] in Main: %p\n", i, var_four);
         write(STDOUT_FILENO, buffer, n);
         
-        int *var_five = malloc(2*i*sizeof(int));
+        int *var_five = malloc(sizeof(int));
         n = sprintf(buffer, "var_five[%d] in Main: %p\n", i, var_five);
         write(STDOUT_FILENO, buffer, n);
         
-        int *var_six = malloc(3*i*sizeof(int));
+        int *var_six = malloc(sizeof(int));
         n = sprintf(buffer, "var_six[%d] in Main: %p\n", i, var_six);
         write(STDOUT_FILENO, buffer, n);
         

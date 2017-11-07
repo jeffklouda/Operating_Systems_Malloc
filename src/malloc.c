@@ -261,7 +261,7 @@ void *malloc(size_t size) {
 
 /* Reclaim space -------------------------------------------------------------*/
 bool coalesce_check(struct block *free_pointer){
-    return (free_pointer->next && free_pointer->free && free_pointer->next->free && (free_pointer->next == (free_pointer + free_pointer->size)));
+    return (free_pointer->next && free_pointer->free && free_pointer->next->free && (free_pointer->next == (sizeof(struct block) + free_pointer + free_pointer->size)));
 }
 
 void free(void *ptr) {
@@ -290,10 +290,28 @@ void free(void *ptr) {
     struct block *free_pointer = FreeList;
     while (free_pointer){
     
-      n = sprintf(buffer, "Inside here!: %p\n", curr);
-      write(STDOUT_FILENO, buffer, n);  
-      while (coalesce_check(free_pointer)) {
+        /*
+        if (free_pointer && free_pointer->next){ 
+            n = sprintf(buffer, "*****************************\n");
+            write(STDOUT_FILENO, buffer, n);  
+            n = sprintf(buffer, "Freepointer->free?: %d\n", free_pointer->free);
+            write(STDOUT_FILENO, buffer, n);  
+            n = sprintf(buffer, "Freepointer->next->free?: %d\n", free_pointer->next->free);
+            write(STDOUT_FILENO, buffer, n);  
+            n = sprintf(buffer, "Freepointer->next: %p\n", free_pointer->next);
+            write(STDOUT_FILENO, buffer, n);  
+            n = sprintf(buffer, "sizeof(struct block) + free_pointer + free_pointer->size: %p\n", (struct block *)(free_pointer + sizeof(struct block) + free_pointer->size));
+            write(STDOUT_FILENO, buffer, n);  
+            n = sprintf(buffer, "*****************************\n");
+            write(STDOUT_FILENO, buffer, n);  
+        }
+        */
 
+        while (coalesce_check(free_pointer)) {
+
+            n = sprintf(buffer, "Inside here!: %p\n", curr);
+            write(STDOUT_FILENO, buffer, n);  
+            
             num_coalesces++;
             num_blocks--;
            
