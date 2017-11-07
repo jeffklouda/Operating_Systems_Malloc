@@ -7,7 +7,8 @@ LIBRARIES=      lib/libmalloc-ff.so \
 		lib/libmalloc-wf.so
 TEST_EXECUTABLES = bin/test1 \
                    bin/test2 \
-                   bin/test3
+                   bin/test3 \
+				   bin/unit_test
 
 all:    $(LIBRARIES) $(TEST_EXECUTABLES)
 
@@ -31,7 +32,10 @@ bin/test2:		src/test2.c
 
 bin/test3:		src/test3.c
 	$(CC) $(CFLAGS) -o $@ $<
- 
+
+bin/unit_test:	src/unit_test.c
+	$(CC) $(CFLAGS) -Llib -lmalloc-ff -o $@ $<
+
 clean:
 	rm -f $(LIBRARIES) $(TEST_EXECUTABLES)
 
