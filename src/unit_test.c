@@ -3,7 +3,7 @@
 
 int main(int argc, char* argv[]) {
    
-    
+    /*
     struct block test_block;
     struct block* block_ptr = NULL;
     block_ptr = &test_block;
@@ -14,7 +14,8 @@ int main(int argc, char* argv[]) {
         
     struct block* last = test_block;
     struct block* test_ptr = grow_heap(&test_block, 12);
-    
+    */
 
     return 0;
 }
+

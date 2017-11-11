@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <stdio.h>
 
-#define NUM_ALLOCS 10
+#define NUM_ALLOCS 2
 
 int main(int argc, char* argv[]){
 
