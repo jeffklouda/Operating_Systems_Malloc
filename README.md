@@ -95,7 +95,9 @@ Demonstration
 -------------
 
 > Place a link to your demonstration slides on [Google Drive].
-
+>
+> https://docs.google.com/a/nd.edu/presentation/d/17b6aKnGlwsYkELW0QyNRCfuw4Sogx5s_GYppNaslVhY/edit?usp=sharing 
+>
 Errata
 ------
 

@@ -93,7 +93,16 @@ struct block *find_free(struct block **last, size_t size) {
         *last = curr;
         curr = curr->next;
     }
-    last_checked = curr;   
+   if (!curr && FreeList){
+        curr = FreeList;
+        while (curr && curr != last_checked && !(curr->free && curr->size >= size)){
+            *last = curr;
+            curr = curr->next;
+        }
+   }
+   if (curr){
+        last_checked = curr;   
+   }
 #endif
 
 #if defined FIT && FIT == 2
@@ -169,7 +178,6 @@ void *malloc(size_t size) {
         atexit_check = false;
     }
 
-    mem_requested += size;
 
     /* Align to multiple of 4 */
     size = ALIGN4(size);
@@ -253,6 +261,7 @@ void *malloc(size_t size) {
 
     /* Increment num_mallocs */
     num_mallocs++;
+    mem_requested += size;
 
     /* Return data address associated with block */
 
@@ -326,10 +335,11 @@ void free(void *ptr) {
     curr->free = true;
 
     /* Coalesce free blocks? */
+    /*
     struct block *free_pointer = FreeList;
     while (free_pointer){
     
-    /*    
+        
         if (free_pointer && free_pointer->next){ 
             n = sprintf(buffer, "*****************************\n");
             write(STDOUT_FILENO, buffer, n);  
@@ -351,14 +361,14 @@ void free(void *ptr) {
             n = sprintf(buffer, "*****************************\n");
             write(STDOUT_FILENO, buffer, n);  
         }
-      */  
+        
 
         while (coalesce_check(free_pointer)) {
-
-            /*
+       
+            
             n = sprintf(buffer, "Inside here!: %p\n", curr);
             write(STDOUT_FILENO, buffer, n);  
-            */
+            
 
             num_coalesces++;
             num_blocks--;
@@ -367,6 +377,22 @@ void free(void *ptr) {
             free_pointer->next = free_pointer->next->next;
         }
         free_pointer = free_pointer->next;
+    }
+    */
+
+
+    if (coalesce_check(curr)) {
+   
+        /* 
+        n = sprintf(buffer, "Inside here!: %p\n", curr);
+        write(STDOUT_FILENO, buffer, n);  
+        */
+
+        num_coalesces++;
+        num_blocks--;
+       
+        curr->size = curr->size + curr->next->size + sizeof(struct block);
+        curr->next = curr->next->next;
     }
 
     /* Increment num_frees */

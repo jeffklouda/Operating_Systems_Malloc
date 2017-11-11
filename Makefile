@@ -8,7 +8,11 @@ LIBRARIES=      lib/libmalloc-ff.so \
 TEST_EXECUTABLES = bin/test1 \
                    bin/test2 \
                    bin/test3 \
-				   bin/unit_test
+				   bin/unit_test \
+                   bin/test_00   \
+                   bin/test_01   \
+                   bin/test_02   \
+                   bin/test_03
 
 all:    $(LIBRARIES) $(TEST_EXECUTABLES)
 
@@ -35,6 +39,18 @@ bin/test3:		src/test3.c
 
 bin/unit_test:	src/unit_test.c
 	$(CC) $(CFLAGS) -Llib -lmalloc-ff -o $@ $<
+
+bin/test_00:	tests/test_00.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+bin/test_01:	tests/test_01.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+bin/test_02:	tests/test_02.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+bin/test_03:	tests/test_03.c
+	$(CC) $(CFLAGS) -o $@ $<
 
 clean:
 	rm -f $(LIBRARIES) $(TEST_EXECUTABLES)
