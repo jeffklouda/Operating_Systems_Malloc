@@ -22,10 +22,10 @@ for arg in args:
     commands[:] = [command + " " + arg for command in commands]
 
 for command, fitType in zip(commands, fitTypes): 
-    millis = int(round(time.time() * 1000))
+    millis = float(time.time() * 1000)
     process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
     output, error = process.communicate()
     print fitType + ':'
     print output
-    print str(int(round(time.time() * 1000)) - millis) + " Milliseconds"
+    print str(float(time.time() * 1000) - millis) + " :Milliseconds"
 
