@@ -43,6 +43,8 @@ size_t num_blocks    = 0;
 size_t mem_requested = 0;
 size_t max_heap_size = 0;
 
+bool atexit_check = true;
+
 void print_counters(void){
     
     char buffer[BUFSIZ];
@@ -159,9 +161,12 @@ struct block *grow_heap(struct block *last, size_t size) {
 
 void *malloc(size_t size) {
 
-    int i = atexit(print_counters);
-    if (i != 0){
-        exit(EXIT_FAILURE);
+    if (atexit_check) {
+        int i = atexit(print_counters);
+        if (i != 0){
+            exit(EXIT_FAILURE);
+        }
+        atexit_check = false;
     }
 
     mem_requested += size;
@@ -251,13 +256,43 @@ void *malloc(size_t size) {
 
     /* Return data address associated with block */
 
+    /*
     char buffer[BUFSIZ];
     int n;
     n = sprintf(buffer, "allocate: %p\n", next);
     write(STDOUT_FILENO, buffer, n);  
-    
+    */
     return BLOCK_DATA(next);
 }
+/*
+void *calloc(size_t num, size_t size) {
+    char buffer[BUFSIZ];
+    int n;
+    
+    n = sprintf(buffer, "top of calloc: \n");
+    write(STDOUT_FILENO, buffer, n);  
+    
+    //struct block* newBlock = (struct block*) malloc(num * size);
+    struct block* newBlock = malloc (4);
+    if (!newBlock) {
+        return NULL;
+    }
+    
+    n = sprintf(buffer, "we be callocing: %p\n", newBlock);
+    write(STDOUT_FILENO, buffer, n);  
+    
+    n = sprintf(buffer, "newBlock->size: %zu\n", (BLOCK_HEADER(newBlock))->size);
+    write(STDOUT_FILENO, buffer, n);   
+
+    char* writer =  (char*)newBlock;
+    for (size_t i = 0; i < (BLOCK_HEADER(newBlock))->size; i++) {
+        *writer = 0;
+        writer++;
+    }
+
+    return newBlock;
+}
+*/
 
 /* Reclaim space -------------------------------------------------------------*/
 bool coalesce_check(struct block *free_pointer){
@@ -282,9 +317,11 @@ void free(void *ptr) {
     /* Make block as free */
     struct block *curr = BLOCK_HEADER(ptr); 
    
+    /*  
     n = sprintf(buffer, "Block to Free: %p\n", curr);
     write(STDOUT_FILENO, buffer, n);  
-    
+    */
+
     assert(curr->free == 0);
     curr->free = true;
 
@@ -318,9 +355,11 @@ void free(void *ptr) {
 
         while (coalesce_check(free_pointer)) {
 
+            /*
             n = sprintf(buffer, "Inside here!: %p\n", curr);
             write(STDOUT_FILENO, buffer, n);  
-            
+            */
+
             num_coalesces++;
             num_blocks--;
            
