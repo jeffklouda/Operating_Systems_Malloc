@@ -45,29 +45,31 @@ size_t max_heap_size = 0;
 
 bool atexit_check = true;
 
+int new_stdout;
+
 void print_counters(void){
     
     char buffer[BUFSIZ];
     int n;
     
     n = sprintf(buffer, "mallocs:   %zu\n", num_mallocs);
-    write(STDOUT_FILENO, buffer, n);  
+    write(new_stdout, buffer, n);  
     n = sprintf(buffer, "frees:     %zu\n", num_frees);
-    write(STDOUT_FILENO, buffer, n);
+    write(new_stdout, buffer, n);
     n = sprintf(buffer, "reuses:    %zu\n", num_reuses);
-    write(STDOUT_FILENO, buffer, n);
+    write(new_stdout, buffer, n);
     n = sprintf(buffer, "grows:     %zu\n", num_requests);
-    write(STDOUT_FILENO, buffer, n);
+    write(new_stdout, buffer, n);
     n = sprintf(buffer, "splits:    %zu\n", num_splits);
-    write(STDOUT_FILENO, buffer, n);
+    write(new_stdout, buffer, n);
     n = sprintf(buffer, "coalesces: %zu\n", num_coalesces);
-    write(STDOUT_FILENO, buffer, n);
+    write(new_stdout, buffer, n);
     n = sprintf(buffer, "blocks:    %zu\n", num_blocks);
-    write(STDOUT_FILENO, buffer, n);
+    write(new_stdout, buffer, n);
     n = sprintf(buffer, "requested: %zu\n", mem_requested);
-    write(STDOUT_FILENO, buffer, n);
+    write(new_stdout, buffer, n);
     n = sprintf(buffer, "max heap:  %zu\n", max_heap_size);
-    write(STDOUT_FILENO, buffer, n);
+    write(new_stdout, buffer, n);
     
 }
 
@@ -173,6 +175,7 @@ struct block *grow_heap(struct block *last, size_t size) {
 void *malloc(size_t size) {
 
     if (atexit_check) {
+        dup2(STDOUT_FILENO, new_stdout);       
         int i = atexit(print_counters);
         if (i != 0){
             exit(EXIT_FAILURE);

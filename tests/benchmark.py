@@ -1,5 +1,6 @@
 import subprocess
 import sys
+import time
 
 if len(sys.argv) < 1:
     print "Please include test program as argument"
@@ -21,8 +22,10 @@ for arg in args:
     commands[:] = [command + " " + arg for command in commands]
 
 for command, fitType in zip(commands, fitTypes): 
+    millis = int(round(time.time() * 1000))
     process = subprocess.Popen(command.split(), stdout=subprocess.PIPE)
     output, error = process.communicate()
     print fitType + ':'
     print output
+    print str(int(round(time.time() * 1000)) - millis) + " Milliseconds"
 
