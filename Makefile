@@ -38,7 +38,7 @@ bin/test3:		src/test3.c
 	$(CC) $(CFLAGS) -o $@ $<
 
 bin/unit_test:	src/unit_test.c
-	$(CC) $(CFLAGS) -Llib -lmalloc-ff -o $@ $<
+	$(CC) $(CFLAGS) -o $@ $<
 
 bin/test_00:	tests/test_00.c
 	$(CC) $(CFLAGS) -o $@ $<
