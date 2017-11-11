@@ -88,14 +88,16 @@ struct block *find_free(struct block **last, size_t size) {
 
 #if defined FIT && FIT == 1
     /* Next fit */
-    curr = last_checked;
+    if (last_checked){
+        curr = last_checked;
+    }
     while (curr && !(curr->free && curr->size >= size)) {
         *last = curr;
         curr = curr->next;
     }
-   if (!curr && FreeList){
+    if (!curr && FreeList){
         curr = FreeList;
-        while (curr && curr != last_checked && !(curr->free && curr->size >= size)){
+        while (curr && !(curr->free && curr->size >= size)){
             *last = curr;
             curr = curr->next;
         }
@@ -205,26 +207,7 @@ void *malloc(size_t size) {
         char *block_char = (char*)new_block + sizeof(struct block) + size;
 
         new_block = (struct block*)block_char; 
-
-        //struct block *new_block = (struct block*)(next + sizeof(struct block) + size);
-        //char buffer[BUFSIZ];
-        //int n;
-        //n = sprintf(buffer, "next: %p\n", next);
-        //write(STDOUT_FILENO, buffer, n);  
-        //n = sprintf(buffer, "new_block: %p\n", new_block);
-        //write(STDOUT_FILENO, buffer, n);  
-        //n = sprintf(buffer, "next->size: %zu\n", next->size);
-        //write(STDOUT_FILENO, buffer, n);  
-        //n = sprintf(buffer, "size: %zu\n", size);
-        //write(STDOUT_FILENO, buffer, n);  
-        //n = sprintf(buffer, "sizeof(struct block) + size: %zu\n", sizeof(struct block) + size);
-        //write(STDOUT_FILENO, buffer, n);  
-        //n = sprintf(buffer, "block_char: %p\n", block_char);
-        //write(STDOUT_FILENO, buffer, n);  
         
-        //n = sprintf(buffer, "new_block->next: %p\n", new_block->next);
-        //write(STDOUT_FILENO, buffer, n);  
-
         new_block->next = next->next;
         new_block->free = true;
         new_block->size = next->size - sizeof(struct block) - size;
@@ -264,44 +247,9 @@ void *malloc(size_t size) {
     mem_requested += size;
 
     /* Return data address associated with block */
-
-    /*
-    char buffer[BUFSIZ];
-    int n;
-    n = sprintf(buffer, "allocate: %p\n", next);
-    write(STDOUT_FILENO, buffer, n);  
-    */
     return BLOCK_DATA(next);
 }
-/*
-void *calloc(size_t num, size_t size) {
-    char buffer[BUFSIZ];
-    int n;
-    
-    n = sprintf(buffer, "top of calloc: \n");
-    write(STDOUT_FILENO, buffer, n);  
-    
-    //struct block* newBlock = (struct block*) malloc(num * size);
-    struct block* newBlock = malloc (4);
-    if (!newBlock) {
-        return NULL;
-    }
-    
-    n = sprintf(buffer, "we be callocing: %p\n", newBlock);
-    write(STDOUT_FILENO, buffer, n);  
-    
-    n = sprintf(buffer, "newBlock->size: %zu\n", (BLOCK_HEADER(newBlock))->size);
-    write(STDOUT_FILENO, buffer, n);   
 
-    char* writer =  (char*)newBlock;
-    for (size_t i = 0; i < (BLOCK_HEADER(newBlock))->size; i++) {
-        *writer = 0;
-        writer++;
-    }
-
-    return newBlock;
-}
-*/
 
 /* Reclaim space -------------------------------------------------------------*/
 bool coalesce_check(struct block *free_pointer){
@@ -315,79 +263,18 @@ void free(void *ptr) {
     if (ptr == NULL) {
         return;
     }
-    char buffer[BUFSIZ];
-    int n;
     
-    //n = sprintf(buffer, "try to free: %p\n", ptr);
-    //write(STDOUT_FILENO, buffer, n);  
-
-
 
     /* Make block as free */
     struct block *curr = BLOCK_HEADER(ptr); 
    
-    /*  
-    n = sprintf(buffer, "Block to Free: %p\n", curr);
-    write(STDOUT_FILENO, buffer, n);  
-    */
-
     assert(curr->free == 0);
     curr->free = true;
 
     /* Coalesce free blocks? */
-    /*
-    struct block *free_pointer = FreeList;
-    while (free_pointer){
-    
-        
-        if (free_pointer && free_pointer->next){ 
-            n = sprintf(buffer, "*****************************\n");
-            write(STDOUT_FILENO, buffer, n);  
-            n = sprintf(buffer, "Freepointer->free?: %d\n", free_pointer->free);
-            write(STDOUT_FILENO, buffer, n);  
-            n = sprintf(buffer, "Freepointer->next->free?: %d\n", free_pointer->next->free);
-            write(STDOUT_FILENO, buffer, n);  
-            n = sprintf(buffer, "Freepointer->next: %p\n", free_pointer->next);
-            write(STDOUT_FILENO, buffer, n);  
-            n = sprintf(buffer, "sizeof(struct block) + free_pointer + free_pointer->size: %p\n", (free_pointer + sizeof(struct block) + free_pointer->size));
-            write(STDOUT_FILENO, buffer, n);  
-            n = sprintf(buffer, "free_pointer->size: %zu\n", free_pointer->size);
-            write(STDOUT_FILENO, buffer, n);  
-            n = sprintf(buffer, "sizeof(struct block): %zu\n", sizeof(struct block));
-            write(STDOUT_FILENO, buffer, n);  
-            n = sprintf(buffer, "free_pointer: %p\n", free_pointer);
-            write(STDOUT_FILENO, buffer, n);  
-            
-            n = sprintf(buffer, "*****************************\n");
-            write(STDOUT_FILENO, buffer, n);  
-        }
-        
-
-        while (coalesce_check(free_pointer)) {
-       
-            
-            n = sprintf(buffer, "Inside here!: %p\n", curr);
-            write(STDOUT_FILENO, buffer, n);  
-            
-
-            num_coalesces++;
-            num_blocks--;
-           
-            free_pointer->size = free_pointer->size + free_pointer->next->size + sizeof(struct block);
-            free_pointer->next = free_pointer->next->next;
-        }
-        free_pointer = free_pointer->next;
-    }
-    */
-
 
     if (coalesce_check(curr)) {
    
-        /* 
-        n = sprintf(buffer, "Inside here!: %p\n", curr);
-        write(STDOUT_FILENO, buffer, n);  
-        */
-
         num_coalesces++;
         num_blocks--;
        
