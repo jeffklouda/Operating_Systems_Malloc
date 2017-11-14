@@ -172,10 +172,35 @@ struct block *grow_heap(struct block *last, size_t size) {
 
 /* Allocate space ------------------------------------------------------------*/
 
+void split (struct block* next, size_t size) {
+    if ( next && (next->size > (size + sizeof(struct block))) ) {
+    
+
+        struct block *new_block = next;
+
+        char *block_char = (char*)new_block + sizeof(struct block) + size;
+
+        new_block = (struct block*)block_char; 
+        
+        new_block->next = next->next;
+        new_block->free = true;
+        new_block->size = next->size - sizeof(struct block) - size;
+        
+        next->next  = new_block; 
+        next->free  = false;
+        next->size  = size;
+        
+        num_splits++;    
+        num_blocks++;
+    }   
+}
+    
 void *malloc(size_t size) {
 
     if (atexit_check) {
-        dup2(STDOUT_FILENO, new_stdout);       
+        if (dup2(STDOUT_FILENO, new_stdout) < 0) {
+            exit(EXIT_FAILURE);
+        }
         int i = atexit(print_counters);
         if (i != 0){
             exit(EXIT_FAILURE);
@@ -202,29 +227,7 @@ void *malloc(size_t size) {
     }
 
     /* Split free block? */
-    if ( next && (next->size > (size + sizeof(struct block))) ) {
-    
-
-        struct block *new_block = next;
-
-        char *block_char = (char*)new_block + sizeof(struct block) + size;
-
-        new_block = (struct block*)block_char; 
-        
-        new_block->next = next->next;
-        new_block->free = true;
-        new_block->size = next->size - sizeof(struct block) - size;
-        
-        next->next  = new_block; 
-        next->free  = false;
-        next->size  = size;
-        
-        num_splits++;    
-        num_blocks++;
-        
-        
-    }   
-    
+    split(next, size);
 
     /* Could not find free block, so grow heap */
     if (next == NULL) {
@@ -261,6 +264,17 @@ bool coalesce_check(struct block *free_pointer){
     return (free_pointer->next && free_pointer->free && free_pointer->next->free && (free_pointer->next == (struct block*)(free_ptr_char)));
 }
 
+void coalesce(struct block *curr) {
+    if (coalesce_check(curr)) {
+   
+        num_coalesces++;
+        num_blocks--;
+       
+        curr->size = curr->size + curr->next->size + sizeof(struct block);
+        curr->next = curr->next->next;
+    }
+}
+
 void free(void *ptr) {
     
     if (ptr == NULL) {
@@ -275,15 +289,7 @@ void free(void *ptr) {
     curr->free = true;
 
     /* Coalesce free blocks? */
-
-    if (coalesce_check(curr)) {
-   
-        num_coalesces++;
-        num_blocks--;
-       
-        curr->size = curr->size + curr->next->size + sizeof(struct block);
-        curr->next = curr->next->next;
-    }
+    coalesce(curr);
 
     /* Increment num_frees */
     num_frees++;
